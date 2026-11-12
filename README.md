@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# northbeam-ats
-northbeam-assignment
-=======
 # Northbeam ATS data layer
 
 A Bronze / Silver / Gold pipeline over 7 raw ATS files, one metric layer, and a small
@@ -14,16 +10,8 @@ How I used AI: `docs/WORKLOG.md`.
 ## Run it (10 minutes)
 
     python -m venv .venv
-    .venv\Scripts\activate            # Windows.  Mac/Linux: source .venv/bin/activate
+    .venv\Scripts\activate        # Windows.  Mac/Linux: source .venv/bin/activate
     pip install -r requirements.txt
-<<<<<<< HEAD
-    python -m src.pipeline.bronze      # raw files -> bronze tables in warehouse.duckdb
-    python -m src.pipeline.silver      # bronze -> silver + quarantine tables
-    python -m src.pipeline.gold        # silver -> star schema (see docs/MODEL.md)
-    python -m src.reconciliation       # 5 control totals, see docs/RECONCILIATION.md
-    pytest -q
->>>>>>> 73d478f (Add raw data, project rules and Bronze loader with tests)
-=======
 
     python -m src.pipeline.bronze     # raw files -> bronze tables (warehouse.duckdb)
     python -m src.pipeline.silver     # bronze -> silver + quarantine tables
@@ -33,7 +21,7 @@ How I used AI: `docs/WORKLOG.md`.
     pytest -q                         # 48 tests
 
     # start the app (set a secret of 32+ characters; if you skip it, a random one is used per start)
-    set JWT_SECRET=<long random text>          # Mac/Linux: export JWT_SECRET=...
+    set JWT_SECRET=<long random text>           # Mac/Linux: export JWT_SECRET=...
     uvicorn src.api.main:app
     # open http://127.0.0.1:8000 and log in with an email and password from demo_credentials.csv
 
@@ -118,4 +106,3 @@ Any free host that runs a Python web service would do. I have not tested a speci
 - Dependency pinning and scanning, CI that runs the tests, monitoring and alerts, backups.
 - Confirm the open data questions in `docs/RECONCILIATION.md` with the client: paise salaries and the
   rounding rule for the acceptance rate.
->>>>>>> 0302773 (Add API with login and scoped access, thin frontend, API tests and README)
