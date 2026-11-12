@@ -214,7 +214,9 @@ def hires_period_over_period(con: duckdb.DuckDBPyConnection, start: date, end: d
     current = hires(con, start, end, scope)
     previous = hires(con, previous_start, previous_end, scope)
     change_pct = None if previous == 0 else round(100.0 * (current - previous) / previous, 1)
+    data_starts = con.execute("SELECT min(date) FROM dim_date").fetchone()[0]
     return {
+        "previous_period_incomplete": previous_start < data_starts,
         "current": current,
         "previous": previous,
         "change": current - previous,
@@ -222,6 +224,43 @@ def hires_period_over_period(con: duckdb.DuckDBPyConnection, start: date, end: d
         "current_period": [start.isoformat(), end.isoformat()],
         "previous_period": [previous_start.isoformat(), previous_end.isoformat()],
     }
+
+
+def requisition_summary(con: duckdb.DuckDBPyConnection, scope: Scope) -> list[dict]:
+    """One row per in-scope requisition with its application, offer and hire counts."""
+    clause, params = scope.clause()
+    sql = f"""
+        WITH apps AS (
+            SELECT req_sk, count(*) AS applications FROM fact_application GROUP BY req_sk
+        ),
+        offers AS (
+            SELECT req_sk, count(*) AS offers FROM fact_offer GROUP BY req_sk
+        ),
+        hired AS (
+            SELECT a.req_sk, count(*) AS hires
+            FROM fact_stage_history h
+            JOIN dim_stage s        ON s.stage_sk = h.stage_sk
+            JOIN fact_application a ON a.application_sk = h.application_sk
+            WHERE s.stage_name = 'Hired'
+            GROUP BY a.req_sk
+        )
+        SELECT r.req_id, r.title, r.department, r.location, r.status, r.headcount,
+               hm.name AS hiring_manager, rc.name AS recruiter,
+               coalesce(apps.applications, 0) AS applications,
+               coalesce(offers.offers, 0)     AS offers,
+               coalesce(hired.hires, 0)       AS hires
+        FROM dim_requisition r
+        LEFT JOIN dim_user hm ON hm.user_sk = r.hiring_manager_user_sk
+        LEFT JOIN dim_user rc ON rc.user_sk = r.recruiter_user_sk
+        LEFT JOIN apps   ON apps.req_sk   = r.req_sk
+        LEFT JOIN offers ON offers.req_sk = r.req_sk
+        LEFT JOIN hired  ON hired.req_sk  = r.req_sk
+        WHERE {clause}
+        ORDER BY r.req_id
+    """
+    cursor = con.execute(sql, params)
+    names = [d[0] for d in cursor.description]
+    return [dict(zip(names, row)) for row in cursor.fetchall()]
 
 
 def headline_metrics(

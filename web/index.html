@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Northbeam hiring metrics</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>Northbeam hiring metrics</h1>
+    <div id="who" hidden><span id="who-text"></span> <button id="logout" type="button">Log out</button></div>
+  </header>
+
+  <main>
+    <section id="login-view">
+      <form id="login-form" autocomplete="on">
+        <label>Email <input id="email" type="email" required autocomplete="username"></label>
+        <label>Password <input id="password" type="password" required autocomplete="current-password"></label>
+        <button type="submit">Log in</button>
+        <p id="login-error" class="error" role="alert"></p>
+      </form>
+    </section>
+
+    <section id="app-view" hidden>
+      <p id="period" class="muted"></p>
+      <div id="cards" class="cards"></div>
+
+      <h2>Stage conversion</h2>
+      <table id="funnel"><thead><tr><th>Stage</th><th>Reached</th><th>From previous stage</th></tr></thead><tbody></tbody></table>
+
+      <h2>Your requisitions</h2>
+      <table id="reqs"><thead><tr>
+        <th>Requisition</th><th>Title</th><th>Department</th><th>Status</th>
+        <th>Applications</th><th>Offers</th><th>Hires</th>
+      </tr></thead><tbody></tbody></table>
+
+      <h2 id="cand-title" hidden></h2>
+      <table id="cands" hidden><thead><tr><th>Name</th><th>Source</th><th>Applied</th><th>Stage</th></tr></thead><tbody></tbody></table>
+      <p id="app-error" class="error" role="alert"></p>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
